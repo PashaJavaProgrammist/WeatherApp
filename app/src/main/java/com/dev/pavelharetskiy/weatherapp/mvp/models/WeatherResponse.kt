@@ -9,7 +9,7 @@ data class WeatherResponseModel(@SerializedName("main")
                                 var main: Weather?,
                                 @SerializedName("dt")
                                 @Expose
-                                var dt: Long?,
+                                var dt: Long=0,
                                 @SerializedName("cod")
                                 @Expose
                                 var cod: Int?,

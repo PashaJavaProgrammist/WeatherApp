@@ -1,5 +1,6 @@
 package com.dev.pavelharetskiy.weatherapp
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
@@ -8,6 +9,8 @@ import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import kotlinx.android.synthetic.main.activity_weather.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
@@ -29,12 +32,15 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
                 android.R.color.holo_red_light)
     }
 
+    @SuppressLint("SimpleDateFormat")
+    private var sdf: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm")
+
     override fun showForecast(data: WeatherResponseModel) {
         tvCityName.text = data.name
         cityName = data.name
-        tvAvTemp.text = data.main?.temp.toString()
-        tvDate.text = data.dt.toString()
-        tvHum.text = data.main?.humidity.toString()
+        tvAvTemp.text = "${data.main?.temp} F"
+        tvDate.text = sdf.format(Date(data.dt*1000L))
+        tvHum.text = data.main?.humidity.toString()+"%"
         tvPresh.text = data.main?.pressure.toString()
         tvMinMax.text = "${data.main?.tempMin} - ${data.main?.tempMax} F"
     }
