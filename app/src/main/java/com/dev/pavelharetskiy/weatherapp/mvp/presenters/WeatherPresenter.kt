@@ -5,6 +5,7 @@ import android.widget.Toast
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.dev.pavelharetskiy.weatherapp.APIKEY
+import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import com.dev.pavelharetskiy.weatherapp.rest.getRestApi
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -26,10 +27,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                 .subscribe(
                         {
                             // Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                            it.main.temp = it.main.temp - 273
-                            it.main.tempMin = it.main.tempMin - 273
-                            it.main.tempMax = it.main.tempMax - 273
-                            it.dt = it.dt *1000L
+                            refactoringWeatherData(it)
                             viewState.showForecast(it)
                             viewState.swipeAnimFinish()
                             d.dispose()
@@ -38,6 +36,13 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                             Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
                             d.dispose()
                         })
+    }
+
+    private fun refactoringWeatherData(w: WeatherResponseModel) {
+        w.main.temp = w.main.temp - 273
+        w.main.tempMin = w.main.tempMin - 273
+        w.main.tempMax = w.main.tempMax - 273
+        w.dt = w.dt * 1000L
     }
 
 }
