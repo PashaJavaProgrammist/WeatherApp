@@ -25,7 +25,11 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         {
-                           // Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                            // Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                            it.main.temp = it.main.temp - 273
+                            it.main.tempMin = it.main.tempMin - 273
+                            it.main.tempMax = it.main.tempMax - 273
+                            it.dt = it.dt *1000L
                             viewState.showForecast(it)
                             viewState.swipeAnimFinish()
                             d.dispose()

@@ -35,14 +35,15 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     @SuppressLint("SimpleDateFormat")
     private var sdf: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm")
 
+    @SuppressLint("SetTextI18n")
     override fun showForecast(data: WeatherResponseModel) {
         tvCityName.text = data.name
         cityName = data.name
-        tvAvTemp.text = "${data.main?.temp} F"
-        tvDate.text = sdf.format(Date(data.dt*1000L))
-        tvHum.text = data.main?.humidity.toString()+"%"
-        tvPresh.text = data.main?.pressure.toString()
-        tvMinMax.text = "${data.main?.tempMin} - ${data.main?.tempMax} F"
+        tvAvTemp.text = "%.2f C".format(data.main.temp)
+        tvDate.text = sdf.format(Date(data.dt))
+        tvHum.text = data.main.humidity.toString() + "%"
+        tvPresh.text = data.main.pressure.toString()
+        tvMinMax.text = "%.2f C".format(data.main.tempMin) + " -  %.2f C".format(data.main.tempMax)
     }
 
     override fun swipeAnimFinish() {

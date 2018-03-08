@@ -6,10 +6,10 @@ import com.google.gson.annotations.SerializedName
 
 data class WeatherResponseModel(@SerializedName("main")
                                 @Expose
-                                var main: Weather?,
+                                var main: Weather,
                                 @SerializedName("dt")
                                 @Expose
-                                var dt: Long=0,
+                                var dt: Long=0L,
                                 @SerializedName("cod")
                                 @Expose
                                 var cod: Int?,
@@ -20,18 +20,18 @@ data class WeatherResponseModel(@SerializedName("main")
 data class Weather(
         @SerializedName("temp")
         @Expose
-        var temp: Double?,
+        var temp: Double=0.0,
         @SerializedName("humidity")
         @Expose
-        var humidity: Long?,
+        var humidity: Long=0L,
         @SerializedName("pressure")
         @Expose
-        var pressure: Double?,
+        var pressure: Double=0.0,
         @SerializedName("temp_min")
         @Expose
-        var tempMin: Double?,
+        var tempMin: Double=0.0,
         @SerializedName("temp_max")
         @Expose
-        var tempMax: Double?
+        var tempMax: Double=0.0
 
 )
