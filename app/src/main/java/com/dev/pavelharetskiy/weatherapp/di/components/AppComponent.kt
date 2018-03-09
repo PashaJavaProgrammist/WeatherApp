@@ -2,18 +2,19 @@ package com.dev.pavelharetskiy.weatherapp.di.components
 
 import android.content.Context
 import com.dev.pavelharetskiy.weatherapp.App
-import com.dev.pavelharetskiy.weatherapp.di.builders.ActivityBuilder
 import com.dev.pavelharetskiy.weatherapp.di.modules.AppModule
+import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import dagger.BindsInstance
 import dagger.Component
-import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(AppModule::class, AndroidInjectionModule::class, ActivityBuilder::class))
+@Component(modules = arrayOf(AppModule::class))
 interface AppComponent {
 
     val context: Context
+
+    fun inject(wp: WeatherPresenter)
 
     @Component.Builder
     interface Builder {

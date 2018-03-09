@@ -11,30 +11,43 @@ import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
+import android.net.ConnectivityManager
+import com.dev.pavelharetskiy.weatherapp.DISCONNECT
 
 @InjectViewState
 class WeatherPresenter : MvpPresenter<IWeatherView>() {
+    init {
+        daggerComponent.inject(this)
+    }
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
 
     private lateinit var d: Disposable
 
     private val context: Context = daggerComponent.context
 
     fun onClickLoadForecast(city: String) {
-        d = getCityWeather(city)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        {
-                            Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                            refactoringWeatherData(it)
-                            viewState.showForecast(it)
-                            viewState.swipeAnimFinish()
-                            d.dispose()
-                        },
-                        {
-                            Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
-                            d.dispose()
-                        })
+        if (isNetworkConnected()) {
+            d = getCityWeather(city)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            {
+                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                                refactoringWeatherData(it)
+                                viewState.showForecast(it)
+                                viewState.swipeAnimFinish()
+                                d.dispose()
+                            },
+                            {
+                                Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
+                                d.dispose()
+                            })
+        } else {
+            Toast.makeText(context, DISCONNECT, Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun refactoringWeatherData(w: WeatherResponseModel) {
@@ -44,4 +57,9 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         w.dt = w.dt * 1000L
     }
 
+    private fun isNetworkConnected(): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = cm.activeNetworkInfo
+        return networkInfo.isConnected
+    }
 }

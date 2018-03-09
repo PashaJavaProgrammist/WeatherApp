@@ -1,10 +1,12 @@
-package com.dev.pavelharetskiy.weatherapp
+package com.dev.pavelharetskiy.weatherapp.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.PresenterType
+import com.dev.pavelharetskiy.weatherapp.PATTERNDATE
+import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
