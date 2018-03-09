@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-
 class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
 
     private var cityName: String = ""
@@ -23,7 +22,7 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     @InjectPresenter(type = PresenterType.GLOBAL)
     lateinit var weatherPresenter: WeatherPresenter
 
-    @Inject
+    @Inject //TODO: Need to move this injection in presenter
     lateinit var context: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +31,7 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
 
         AndroidInjection.inject(this)
         weatherPresenter.context = context
+
         btShow.setOnClickListener({ onClickShow() })
         swprfrshlt.setOnRefreshListener({ onSwipe() })
         swprfrshlt.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -41,7 +41,7 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     }
 
     @SuppressLint("SimpleDateFormat")
-    private var sdf: SimpleDateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm")
+    private var sdf: SimpleDateFormat = SimpleDateFormat(PATTERNDATE)
 
     @SuppressLint("SetTextI18n")
     override fun showForecast(data: WeatherResponseModel) {

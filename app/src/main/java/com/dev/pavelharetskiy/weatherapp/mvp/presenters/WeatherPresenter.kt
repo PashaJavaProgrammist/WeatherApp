@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers
 @InjectViewState
 class WeatherPresenter : MvpPresenter<IWeatherView>() {
 
-    lateinit var d: Disposable
+    private lateinit var d: Disposable
 
     //    @Inject    //TODO: Need to inject here
     lateinit var context: Context
