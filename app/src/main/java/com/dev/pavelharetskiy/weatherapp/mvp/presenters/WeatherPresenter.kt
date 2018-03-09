@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
+import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
 import com.dev.pavelharetskiy.weatherapp.iteractors.getCityWeather
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
@@ -16,8 +17,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
 
     private lateinit var d: Disposable
 
-    //    @Inject    //TODO: Need to inject here
-    lateinit var context: Context
+    private val context: Context = daggerComponent.context
 
     fun onClickLoadForecast(city: String) {
         d = getCityWeather(city)

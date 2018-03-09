@@ -1,5 +1,6 @@
 package com.dev.pavelharetskiy.weatherapp.di.components
 
+import android.content.Context
 import com.dev.pavelharetskiy.weatherapp.App
 import com.dev.pavelharetskiy.weatherapp.di.builders.ActivityBuilder
 import com.dev.pavelharetskiy.weatherapp.di.modules.AppModule
@@ -11,6 +12,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = arrayOf(AppModule::class, AndroidInjectionModule::class, ActivityBuilder::class))
 interface AppComponent {
+
+    val context: Context
 
     @Component.Builder
     interface Builder {
