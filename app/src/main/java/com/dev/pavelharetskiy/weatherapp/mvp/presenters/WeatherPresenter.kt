@@ -1,21 +1,20 @@
 package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
-import android.content.Context
-import android.widget.Toast
+import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
+import com.dev.pavelharetskiy.weatherapp.DISCONNECT
 import com.dev.pavelharetskiy.weatherapp.iteractors.getCityWeather
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import android.net.ConnectivityManager
-import com.dev.pavelharetskiy.weatherapp.DISCONNECT
 
 @InjectViewState
 class WeatherPresenter : MvpPresenter<IWeatherView>() {
+
     init {
         daggerComponent.inject(this)
     }
@@ -24,8 +23,6 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     lateinit var connectivityManager: ConnectivityManager
 
     private lateinit var d: Disposable
-
-    private val context: Context = daggerComponent.context
 
     fun onClickLoadForecast(city: String) {
         if (isNetworkConnected()) {
@@ -43,22 +40,22 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                     )
                     .subscribe(
                             {
-                                Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
+                                viewState.showToast(it.toString(), true)
                                 viewState.showForecast(it)
                                 d.dispose()
                             },
                             {
-                                Toast.makeText(context, it.toString(), Toast.LENGTH_SHORT).show()
+                                viewState.showToast(it.toString(), false)
                                 d.dispose()
                             })
         } else {
-            Toast.makeText(context, DISCONNECT, Toast.LENGTH_SHORT).show()
+            viewState.showToast(DISCONNECT, false)
         }
         viewState.swipeAnimFinish()
     }
 
     private fun isNetworkConnected(): Boolean {
         val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo.isConnected
+        return networkInfo != null && networkInfo.isConnectedOrConnecting
     }
 }

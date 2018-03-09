@@ -2,6 +2,7 @@ package com.dev.pavelharetskiy.weatherapp.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.PresenterType
@@ -49,6 +50,11 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
 
     override fun swipeAnimFinish() {
         swprfrshlt.isRefreshing = false
+    }
+
+    override fun showToast(text: String, longToast: Boolean) {
+        val lengts: Int = if (longToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+        Toast.makeText(this, text, lengts).show()
     }
 
     private fun onClickShow() {

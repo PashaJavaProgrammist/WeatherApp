@@ -1,6 +1,5 @@
 package com.dev.pavelharetskiy.weatherapp.di.components
 
-import android.content.Context
 import com.dev.pavelharetskiy.weatherapp.App
 import com.dev.pavelharetskiy.weatherapp.di.modules.AppModule
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
@@ -12,10 +11,6 @@ import javax.inject.Singleton
 @Component(modules = [(AppModule::class)])
 interface AppComponent {
 
-    val context: Context
-
-    fun inject(wp: WeatherPresenter)
-
     @Component.Builder
     interface Builder {
         @BindsInstance
@@ -23,6 +18,8 @@ interface AppComponent {
 
         fun build(): AppComponent
     }
+
+    fun inject(wp: WeatherPresenter)
 
     fun inject(app: App)
 }
