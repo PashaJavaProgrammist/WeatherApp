@@ -1,6 +1,7 @@
 package com.dev.pavelharetskiy.weatherapp
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
@@ -8,9 +9,11 @@ import com.arellomobile.mvp.presenter.PresenterType
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_weather.*
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
 
 class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
@@ -20,10 +23,15 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     @InjectPresenter(type = PresenterType.GLOBAL)
     lateinit var weatherPresenter: WeatherPresenter
 
+    @Inject
+    lateinit var context: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
 
+        AndroidInjection.inject(this)
+        weatherPresenter.context = context
         btShow.setOnClickListener({ onClickShow() })
         swprfrshlt.setOnRefreshListener({ onSwipe() })
         swprfrshlt.setColorSchemeResources(android.R.color.holo_blue_bright,
@@ -51,12 +59,12 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     }
 
     private fun onClickShow() {
-        weatherPresenter.onClickLoadForecast(this.applicationContext, edCity.text.toString())
+        weatherPresenter.onClickLoadForecast(edCity.text.toString())
     }
 
     private fun onSwipe() {
         if (cityName.isNotEmpty()) {
-            weatherPresenter.onClickLoadForecast(this.applicationContext, cityName)
+            weatherPresenter.onClickLoadForecast(cityName)
         } else {
             swipeAnimFinish()
         }
