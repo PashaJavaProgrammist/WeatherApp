@@ -38,7 +38,6 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                                 Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
                                 refactoringWeatherData(it)
                                 viewState.showForecast(it)
-                                viewState.swipeAnimFinish()
                                 d.dispose()
                             },
                             {
@@ -48,6 +47,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         } else {
             Toast.makeText(context, DISCONNECT, Toast.LENGTH_SHORT).show()
         }
+        viewState.swipeAnimFinish()
     }
 
     private fun refactoringWeatherData(w: WeatherResponseModel) {
@@ -58,8 +58,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     }
 
     private fun isNetworkConnected(): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = cm.activeNetworkInfo
+        val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo.isConnected
     }
 }
