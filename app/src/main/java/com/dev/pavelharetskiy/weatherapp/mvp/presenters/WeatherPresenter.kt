@@ -6,7 +6,6 @@ import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
 import com.dev.pavelharetskiy.weatherapp.iteractors.getCityWeather
-import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -33,10 +32,18 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
             d = getCityWeather(city)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
+                    .map(
+                            {
+                                it.main.temp = it.main.temp - 273
+                                it.main.tempMin = it.main.tempMin - 273
+                                it.main.tempMax = it.main.tempMax - 273
+                                it.dt = it.dt * 1000L
+                                it
+                            }
+                    )
                     .subscribe(
                             {
                                 Toast.makeText(context, it.toString(), Toast.LENGTH_LONG).show()
-                                refactoringWeatherData(it)
                                 viewState.showForecast(it)
                                 d.dispose()
                             },
@@ -48,13 +55,6 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
             Toast.makeText(context, DISCONNECT, Toast.LENGTH_SHORT).show()
         }
         viewState.swipeAnimFinish()
-    }
-
-    private fun refactoringWeatherData(w: WeatherResponseModel) {
-        w.main.temp = w.main.temp - 273
-        w.main.tempMin = w.main.tempMin - 273
-        w.main.tempMax = w.main.tempMax - 273
-        w.dt = w.dt * 1000L
     }
 
     private fun isNetworkConnected(): Boolean {
