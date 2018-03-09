@@ -11,4 +11,5 @@ interface IWeatherView : MvpView {
     fun showForecast(data: WeatherResponseModel)
     fun swipeAnimFinish()
     fun showToast(text: String, longToast: Boolean)
+    fun setLog(logInfo: String)
 }

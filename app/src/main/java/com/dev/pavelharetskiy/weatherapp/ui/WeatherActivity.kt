@@ -11,6 +11,7 @@ import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
+import com.jakewharton.rxbinding2.widget.RxTextView
 import kotlinx.android.synthetic.main.activity_weather.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,7 +27,6 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
 
-        btShow.setOnClickListener({ onClickShow() })
         swprfrshlt.setOnRefreshListener({ onSwipe() })
         swprfrshlt.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light,
@@ -57,8 +57,18 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
         Toast.makeText(this, text, lengts).show()
     }
 
-    private fun onClickShow() {
-        weatherPresenter.onClickLoadForecast(edCity.text.toString())
+    override fun setLog(logInfo: String) {
+        tvlog.text = logInfo
+    }
+
+    override fun onStart() {
+        super.onStart()
+        weatherPresenter.textObserve(RxTextView.textChanges(edCity))
+    }
+
+    override fun onStop() {
+        super.onStop()
+        weatherPresenter.disposeTextObserve()
     }
 
     private fun onSwipe() {

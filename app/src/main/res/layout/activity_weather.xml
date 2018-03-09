@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swprfrshlt"
     android:layout_width="match_parent"
@@ -12,26 +11,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btShow"
-            android:text="Show"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <EditText
             android:id="@+id/edCity"
-            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter City"/>
-
+            android:hint="@string/enter_city"
+            android:inputType="text" />
 
         <TextView
             android:id="@+id/tvCityName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="City"
+            android:text="@string/city"
             android:textSize="25sp" />
 
         <TextView
@@ -39,28 +31,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Temperature" />
+            android:text="@string/temperature" />
 
         <TextView
             android:id="@+id/tvHum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Humidity" />
+            android:text="@string/humidity" />
 
         <TextView
             android:id="@+id/tvPresh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Presure" />
+            android:text="@string/presure" />
 
         <TextView
             android:id="@+id/tvMinMax"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Min-max Temp" />
+            android:text="@string/min_max_temp" />
 
         <TextView
             android:id="@+id/tvDate"
@@ -68,7 +60,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="20dp"
-            android:text="Date" />
+            android:text="@string/date" />
+
+        <TextView
+            android:id="@+id/tvlog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="10dp"
+            android:text="@string/log"
+            android:textColor="@color/colorPrimary" />
     </LinearLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>
