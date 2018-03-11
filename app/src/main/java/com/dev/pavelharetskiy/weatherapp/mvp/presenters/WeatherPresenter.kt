@@ -25,7 +25,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     lateinit var connectivityManager: ConnectivityManager
 
     private lateinit var textChanges: InitialValueObservable<CharSequence>
-
+    var isAfterConfChanged: Boolean = false
     private lateinit var requestDisp: Disposable
     private lateinit var textWatchDisposable: Disposable
 
@@ -78,7 +78,13 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                 .subscribe(
                         {
                             if (isNetworkConnected()) {
-                                if (it.isNotEmpty()) loadWeather(it.toString())
+                                if (!isAfterConfChanged) {
+                                    if (it.isNotEmpty()) {
+                                        loadWeather(it.toString())
+                                    }
+                                } else {
+                                    isAfterConfChanged = false
+                                }
                             } else {
                                 viewState.showToast(DISCONNECT, false)
                             }

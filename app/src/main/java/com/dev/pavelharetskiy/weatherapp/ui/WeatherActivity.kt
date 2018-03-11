@@ -79,6 +79,11 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        weatherPresenter.isAfterConfChanged = true
+    }
+
     private fun onSwipe() {
         if (cityName.isNotEmpty()) {
             weatherPresenter.onClickLoadForecast(cityName)
