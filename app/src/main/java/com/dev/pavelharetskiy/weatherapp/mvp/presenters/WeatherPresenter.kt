@@ -64,7 +64,8 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                         })
     }
 
-    private fun isNetworkConnected() = connectivityManager.activeNetworkInfo.isConnectedOrConnecting
+    private fun isNetworkConnected() =
+            connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo.isConnectedOrConnecting
 
     fun textObserve(textChanges: InitialValueObservable<CharSequence>) {
         this.textChanges = textChanges
@@ -76,7 +77,11 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                 .debounce(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .subscribe(
                         {
-                            if (it.isNotEmpty()) loadWeather(it.toString())
+                            if (isNetworkConnected()) {
+                                if (it.isNotEmpty()) loadWeather(it.toString())
+                            } else {
+                                viewState.showToast(DISCONNECT, false)
+                            }
                         },
                         {
                             viewState.showToast("$TEXTWATCHERROR: $it", false)
