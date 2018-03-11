@@ -26,7 +26,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
 
     private lateinit var textChanges: InitialValueObservable<CharSequence>
 
-    private lateinit var d: Disposable
+    private lateinit var requestDisp: Disposable
     private lateinit var textWatchDisposable: Disposable
 
     fun onClickLoadForecast(city: String) {
@@ -39,7 +39,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     }
 
     private fun loadWeather(city: String) {
-        d = getCityWeather(city)
+        requestDisp = getCityWeather(city)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .map(
@@ -56,11 +56,11 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                             viewState.showToast(it.name, true)
                             viewState.setLog(FOUND)
                             viewState.showForecast(it)
-                            d.dispose()
+                            requestDisp.dispose()
                         },
                         {
-                            viewState.setLog("$NOTFOUND\n$it")
-                            d.dispose()
+                            viewState.setLog(ERROR)
+                            requestDisp.dispose()
                         })
     }
 
@@ -71,7 +71,9 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         textWatchDisposable = textChanges
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .throttleWithTimeout(50, TimeUnit.MILLISECONDS)
+                //.skip(1)
+                //.throttleWithTimeout(300, TimeUnit.MILLISECONDS)
+                .debounce(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .subscribe(
                         {
                             if (it.isNotEmpty()) loadWeather(it.toString())
@@ -81,11 +83,13 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                         })
     }
 
-    fun disposeTextObserve() {
+    override fun detachView(view: IWeatherView?) {
+        super.detachView(view)
+        textWatchDisposable.dispose()
         try {
-            textWatchDisposable.dispose()
-        } catch (ex: ExceptionInInitializerError) {
-            viewState.showToast(INITERROR, false)
+            requestDisp.dispose()
+        } catch (ex: Exception) {
+            viewState.setLog(ERROR)
         }
     }
 

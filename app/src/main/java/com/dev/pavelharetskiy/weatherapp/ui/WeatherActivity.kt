@@ -6,6 +6,7 @@ import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
 import com.arellomobile.mvp.presenter.PresenterType
+import com.dev.pavelharetskiy.weatherapp.CITYNAMEKEY
 import com.dev.pavelharetskiy.weatherapp.PATTERNDATE
 import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
@@ -66,9 +67,16 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
         weatherPresenter.textObserve(RxTextView.textChanges(edCity))
     }
 
-    override fun onStop() {
-        super.onStop()
-        weatherPresenter.disposeTextObserve()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(CITYNAMEKEY, cityName)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState.containsKey(CITYNAMEKEY)) {
+            cityName = savedInstanceState.getString(CITYNAMEKEY)
+        }
     }
 
     private fun onSwipe() {
