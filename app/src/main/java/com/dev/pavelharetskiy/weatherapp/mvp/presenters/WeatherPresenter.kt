@@ -56,8 +56,8 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
 
     private fun loadWeather(city: String) {
         requestDisp = restIteractor.getCityWeather(city)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         {
                             viewState.showToast(it.name, true)
@@ -71,15 +71,14 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                         })
     }
 
-    private fun isNetworkConnected() =
-            connectivityManager.activeNetworkInfo != null && connectivityManager.activeNetworkInfo.isConnectedOrConnecting
+    private fun isNetworkConnected() = connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
 
     fun textObserve(textChanges: InitialValueObservable<CharSequence>) {
         this.textChanges = textChanges
         textWatchDisposable = textChanges
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .debounce(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         {
                             when {
@@ -93,13 +92,13 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                         })
     }
 
-    override fun detachView(view: IWeatherView?) {
-        super.detachView(view)
+    override fun destroyView(view: IWeatherView?) {
+        super.destroyView(view)
         textWatchDisposable.dispose()
         try {
             requestDisp.dispose()
         } catch (ex: Exception) {
-            viewState.setLog(ERROR)
+            viewState.showToast(ERROR, false)
         }
     }
 
