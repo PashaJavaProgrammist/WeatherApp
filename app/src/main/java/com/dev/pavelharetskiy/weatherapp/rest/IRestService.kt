@@ -10,5 +10,6 @@ interface IRestService {
 
     @GET("weather")
     fun loadCityWeather(@Query("q") city: String,
-                        @Query("appid") apikey: String): Observable<WeatherResponseModel>
+                        @Query("appid") apikey: String,
+                        @Query("units") units: String): Observable<WeatherResponseModel>
 }

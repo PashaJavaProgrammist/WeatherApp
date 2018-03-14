@@ -8,4 +8,11 @@
     <string name="humidity">Humidity</string>
     <string name="temperature">Temperature</string>
     <string name="log">Log</string>
+    <string name="format_two_num">%.2f C</string>
+    <string name="two_dotes">:\u0020</string>
+    <string name="procents">%</string>
+    <string name="temp">Temp:\u0020</string>
+    <string name="pres">Presure:\u0020</string>
+    <string name="hPA">\u0020hPa</string>
+    <string name="space">\u0020</string>
 </resources>

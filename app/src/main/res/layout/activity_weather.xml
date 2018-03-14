@@ -48,13 +48,6 @@
             android:text="@string/presure" />
 
         <TextView
-            android:id="@+id/tvMinMax"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/min_max_temp" />
-
-        <TextView
             android:id="@+id/tvDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

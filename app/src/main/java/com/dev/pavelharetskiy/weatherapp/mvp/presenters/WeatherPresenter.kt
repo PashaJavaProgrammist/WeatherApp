@@ -1,16 +1,21 @@
 package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
+import android.content.Context
 import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import com.dev.pavelharetskiy.weatherapp.*
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
-import com.dev.pavelharetskiy.weatherapp.iteractors.getCityWeather
+import com.dev.pavelharetskiy.weatherapp.DISCONNECT
+import com.dev.pavelharetskiy.weatherapp.ERROR
+import com.dev.pavelharetskiy.weatherapp.FOUND
+import com.dev.pavelharetskiy.weatherapp.TEXT_WATCH_ERROR
+import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 import com.jakewharton.rxbinding2.InitialValueObservable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.text.DateFormat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -24,33 +29,35 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
+    @Inject
+    lateinit var context: Context
+
+    @Inject
+    lateinit var restIteractor: RestIteractor
+
+    val dateFormat: DateFormat
+        get() = android.text.format.DateFormat.getDateFormat(context)
+    val timeFormat: DateFormat
+        get() = android.text.format.DateFormat.getTimeFormat(context)
+
     private lateinit var textChanges: InitialValueObservable<CharSequence>
     var isAfterConfChanged: Boolean = false
     private lateinit var requestDisp: Disposable
     private lateinit var textWatchDisposable: Disposable
+    var cityName = ""
 
     fun onClickLoadForecast(city: String) {
-        if (isNetworkConnected()) {
-            loadWeather(city)
-        } else {
-            viewState.showToast(DISCONNECT, false)
+        when {
+            !isNetworkConnected() -> viewState.showToast(DISCONNECT, false)
+            isNetworkConnected() -> loadWeather(city)
         }
         viewState.swipeAnimFinish()
     }
 
     private fun loadWeather(city: String) {
-        requestDisp = getCityWeather(city)
+        requestDisp = restIteractor.getCityWeather(city)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .map(
-                        {
-                            it.main.temp = it.main.temp - 273
-                            it.main.tempMin = it.main.tempMin - 273
-                            it.main.tempMax = it.main.tempMax - 273
-                            it.dt = it.dt * 1000L
-                            it
-                        }
-                )
                 .subscribe(
                         {
                             viewState.showToast(it.name, true)
@@ -72,25 +79,17 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         textWatchDisposable = textChanges
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                //.skip(1)
-                //.throttleWithTimeout(300, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
                 .subscribe(
                         {
-                            if (isNetworkConnected()) {
-                                if (!isAfterConfChanged) {
-                                    if (it.isNotEmpty()) {
-                                        loadWeather(it.toString())
-                                    }
-                                } else {
-                                    isAfterConfChanged = false
-                                }
-                            } else {
-                                viewState.showToast(DISCONNECT, false)
+                            when {
+                                isAfterConfChanged -> isAfterConfChanged = false
+                                !isNetworkConnected() -> viewState.showToast(DISCONNECT, false)
+                                it.isNotEmpty() -> loadWeather(it.toString())
                             }
                         },
                         {
-                            viewState.showToast("$TEXTWATCHERROR: $it", false)
+                            viewState.showToast("$TEXT_WATCH_ERROR: $it", true)
                         })
     }
 
