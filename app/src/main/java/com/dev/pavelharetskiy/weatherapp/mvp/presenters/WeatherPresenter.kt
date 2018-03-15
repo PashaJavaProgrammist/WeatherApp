@@ -1,20 +1,19 @@
 package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
-import android.content.Context
+//import com.jakewharton.rxbinding2.InitialValueObservable
+//import java.util.concurrent.TimeUnit
 import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.dev.pavelharetskiy.weatherapp.*
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
 import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
+import com.dev.pavelharetskiy.weatherapp.mvp.models.DateFormatsList
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
-//import com.jakewharton.rxbinding2.InitialValueObservable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.text.DateFormat
-//import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectViewState
@@ -28,17 +27,15 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     lateinit var connectivityManager: ConnectivityManager
 
     @Inject
-    lateinit var context: Context
+    lateinit var restIteractor: RestIteractor
 
     @Inject
-    lateinit var restIteractor: RestIteractor
+    lateinit var dateFormatsList: DateFormatsList
 
     private lateinit var weather: WeatherResponseModel
 
-    val dateFormat: DateFormat
-        get() = android.text.format.DateFormat.getDateFormat(context)
-    val timeFormat: DateFormat
-        get() = android.text.format.DateFormat.getTimeFormat(context)
+    var dateFormat = dateFormatsList.listFormats[1]
+    var timeFormat = dateFormatsList.listFormats[0]
 
     private lateinit var requestDisp: Disposable
     var cityName = ""
@@ -86,7 +83,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         try {
             viewState.showForecast(weather)
         } catch (ex: Exception) {
-            viewState.showToast(ENTER_CITY, false)
+            viewState.setLog(ENTER_CITY)
         }
     }
 

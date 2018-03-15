@@ -3,6 +3,7 @@ package com.dev.pavelharetskiy.weatherapp.di.components
 import com.dev.pavelharetskiy.weatherapp.App
 import com.dev.pavelharetskiy.weatherapp.di.modules.AppModule
 import com.dev.pavelharetskiy.weatherapp.di.modules.ConnectManagerModule
+import com.dev.pavelharetskiy.weatherapp.di.modules.DateFormatModule
 import com.dev.pavelharetskiy.weatherapp.di.modules.RestModule
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import dagger.BindsInstance
@@ -10,7 +11,7 @@ import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(AppModule::class), (ConnectManagerModule::class), (RestModule::class)])
+@Component(modules = [(AppModule::class), (ConnectManagerModule::class), (RestModule::class), (DateFormatModule::class)])
 interface AppComponent {
 
     @Component.Builder
