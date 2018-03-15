@@ -4,19 +4,17 @@ import android.content.Context
 import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
+import com.dev.pavelharetskiy.weatherapp.*
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
-import com.dev.pavelharetskiy.weatherapp.DISCONNECT
-import com.dev.pavelharetskiy.weatherapp.ERROR
-import com.dev.pavelharetskiy.weatherapp.FOUND
-import com.dev.pavelharetskiy.weatherapp.TEXT_WATCH_ERROR
 import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
+import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
-import com.jakewharton.rxbinding2.InitialValueObservable
+//import com.jakewharton.rxbinding2.InitialValueObservable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.text.DateFormat
-import java.util.concurrent.TimeUnit
+//import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @InjectViewState
@@ -35,16 +33,20 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     @Inject
     lateinit var restIteractor: RestIteractor
 
+    private lateinit var weather: WeatherResponseModel
+
     val dateFormat: DateFormat
         get() = android.text.format.DateFormat.getDateFormat(context)
     val timeFormat: DateFormat
         get() = android.text.format.DateFormat.getTimeFormat(context)
 
-    private lateinit var textChanges: InitialValueObservable<CharSequence>
-    var isAfterConfChanged: Boolean = false
     private lateinit var requestDisp: Disposable
-    private lateinit var textWatchDisposable: Disposable
     var cityName = ""
+    private var isViewAttached = false
+
+    //    private lateinit var textChanges: InitialValueObservable<CharSequence>
+    //var isAfterConfChanged: Boolean = false
+    //    private lateinit var textWatchDisposable: Disposable
 
     fun onClickLoadForecast(city: String) {
         when {
@@ -54,26 +56,48 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
         viewState.swipeAnimFinish()
     }
 
-    private fun loadWeather(city: String) {
+    fun loadWeather(city: String) {
         requestDisp = restIteractor.getCityWeather(city)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         {
-                            viewState.showToast(it.name, true)
-                            viewState.setLog(FOUND)
-                            viewState.showForecast(it)
+                            if (isViewAttached) {
+                                viewState.showToast(it.name, true)
+                                viewState.setLog(FOUND)
+                                viewState.showForecast(it)
+                            }
+                            weather = it
                             requestDisp.dispose()
                         },
                         {
-                            viewState.setLog(ERROR)
+                            if (isViewAttached) {
+                                viewState.setLog(ERROR)
+                            }
                             requestDisp.dispose()
                         })
     }
 
     private fun isNetworkConnected() = connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
 
-    fun textObserve(textChanges: InitialValueObservable<CharSequence>) {
+    override fun attachView(view: IWeatherView?) {
+        super.attachView(view)
+        isViewAttached = true
+        try {
+            viewState.showForecast(weather)
+        } catch (ex: Exception) {
+            viewState.showToast(ENTER_CITY, false)
+        }
+    }
+
+    override fun detachView(view: IWeatherView?) {
+        super.detachView(view)
+        isViewAttached = false
+//        textWatchDisposable.dispose()
+    }
+
+    //        Not mvp
+    /*fun textObserve(textChanges: InitialValueObservable<CharSequence>) {
         this.textChanges = textChanges
         textWatchDisposable = textChanges
                 .subscribeOn(Schedulers.io())
@@ -90,16 +114,5 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
                         {
                             viewState.showToast("$TEXT_WATCH_ERROR: $it", true)
                         })
-    }
-
-    override fun destroyView(view: IWeatherView?) {
-        super.destroyView(view)
-        textWatchDisposable.dispose()
-        try {
-            requestDisp.dispose()
-        } catch (ex: Exception) {
-            viewState.showToast(ERROR, false)
-        }
-    }
-
+    }*/
 }

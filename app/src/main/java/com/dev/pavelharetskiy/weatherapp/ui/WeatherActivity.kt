@@ -1,6 +1,8 @@
 package com.dev.pavelharetskiy.weatherapp.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Toast
 import com.arellomobile.mvp.MvpAppCompatActivity
 import com.arellomobile.mvp.presenter.InjectPresenter
@@ -9,7 +11,7 @@ import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
-import com.jakewharton.rxbinding2.widget.RxTextView
+//import com.jakewharton.rxbinding2.widget.RxTextView
 import kotlinx.android.synthetic.main.activity_weather.*
 import java.util.*
 
@@ -51,14 +53,21 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
         tvlog.text = logInfo
     }
 
-    override fun onStart() {
-        super.onStart()
-        weatherPresenter.textObserve(RxTextView.textChanges(edCity))
-    }
+    override fun onResume() {
+        super.onResume()
 
-    override fun onDestroy() {
-        super.onDestroy()
-        weatherPresenter.isAfterConfChanged = true
+//        Not mvp
+//        weatherPresenter.textObserve(RxTextView.textChanges(edCity))
+
+        edCity.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(city: Editable) {
+                weatherPresenter.loadWeather(city.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun onSwipe() {
