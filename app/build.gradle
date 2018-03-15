@@ -47,10 +47,10 @@ dependencies {
 //    implementation 'com.jakewharton.rxbinding2:rxbinding-design-kotlin:2.0.0'
 
     //MVP
-    implementation 'com.arello-mobile:moxy:1.5.3'
-    implementation 'com.arello-mobile:moxy-android:1.1.1'
-    implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
-    kapt 'com.arello-mobile:moxy-compiler:1.5.3'
+//    implementation 'com.arello-mobile:moxy:1.5.3'
+//    implementation 'com.arello-mobile:moxy-android:1.1.1'
+//    implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
+//    kapt 'com.arello-mobile:moxy-compiler:1.5.3'
 
     //DI
     implementation 'com.google.dagger:dagger:2.14.1'

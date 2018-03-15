@@ -1,27 +1,29 @@
 package com.dev.pavelharetskiy.weatherapp.ui
 
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
-import com.arellomobile.mvp.MvpAppCompatActivity
-import com.arellomobile.mvp.presenter.InjectPresenter
-import com.arellomobile.mvp.presenter.PresenterType
+import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
 import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
-import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
+import com.dev.pavelharetskiy.weatherapp.mvp.presenters.Presenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
-//import com.jakewharton.rxbinding2.widget.RxTextView
 import kotlinx.android.synthetic.main.activity_weather.*
 import java.util.*
+import javax.inject.Inject
 
-class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
+class WeatherActivity : AppCompatActivity(), IWeatherView {
 
-    @InjectPresenter(type = PresenterType.GLOBAL)
-    lateinit var weatherPresenter: WeatherPresenter
+    @Inject
+    lateinit var weatherPresenter: Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        daggerComponent.inject(this)
+
         setContentView(R.layout.activity_weather)
 
         swprfrshlt.setOnRefreshListener({ onSwipe() })
@@ -56,9 +58,7 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     override fun onResume() {
         super.onResume()
 
-//        Not mvp
-//        weatherPresenter.textObserve(RxTextView.textChanges(edCity))
-
+        weatherPresenter.attachView(this)
         edCity.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(city: Editable) {
                 weatherPresenter.loadWeather(city.toString())
@@ -68,6 +68,11 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+        weatherPresenter.detachView()
     }
 
     private fun onSwipe() {

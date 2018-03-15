@@ -1,17 +1,15 @@
 package com.dev.pavelharetskiy.weatherapp.di.components
 
 import com.dev.pavelharetskiy.weatherapp.App
-import com.dev.pavelharetskiy.weatherapp.di.modules.AppModule
-import com.dev.pavelharetskiy.weatherapp.di.modules.ConnectManagerModule
-import com.dev.pavelharetskiy.weatherapp.di.modules.DateFormatModule
-import com.dev.pavelharetskiy.weatherapp.di.modules.RestModule
-import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
+import com.dev.pavelharetskiy.weatherapp.di.modules.*
+import com.dev.pavelharetskiy.weatherapp.mvp.presenters.Presenter
+import com.dev.pavelharetskiy.weatherapp.ui.WeatherActivity
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = [(AppModule::class), (ConnectManagerModule::class), (RestModule::class), (DateFormatModule::class)])
+@Component(modules = [(AppModule::class), (ConnectManagerModule::class), (RestModule::class), (DateFormatModule::class), (PresenterModule::class)])
 interface AppComponent {
 
     @Component.Builder
@@ -22,7 +20,7 @@ interface AppComponent {
         fun build(): AppComponent
     }
 
-    fun inject(wp: WeatherPresenter)
-
     fun inject(app: App)
+
+    fun inject(activity: WeatherActivity)
 }
