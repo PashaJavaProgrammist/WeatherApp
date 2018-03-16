@@ -13,17 +13,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class Presenter (var connectivityManager: ConnectivityManager,
-                 var restIteractor: RestIteractor,
-                 dateFormatsList: DateFormatsList) : IPresenter<IWeatherView> {
+class Presenter(private var connectivityManager: ConnectivityManager,
+                private var restIteractor: RestIteractor,
+                dateFormatsList: DateFormatsList) : IPresenter<IWeatherView> {
 
-    var weaterView: IWeatherView? = null
+    private var weaterView: IWeatherView? = null
 
     override fun attachView(view: IWeatherView) {
         weaterView = view
         isViewAttached = true
         try {
             weaterView?.showForecast(weather)
+            weaterView?.setLog(FOUND)
         } catch (ex: Exception) {
             weaterView?.setLog(ENTER_CITY)
         }
@@ -43,15 +44,22 @@ class Presenter (var connectivityManager: ConnectivityManager,
     var cityName = ""
     private var isViewAttached = false
 
-    fun onClickLoadForecast(city: String) {
+    fun loadWeather(city: String) {
         when {
             !isNetworkConnected() -> weaterView?.showToast(DISCONNECT, false)
-            isNetworkConnected() -> loadWeather(city)
+            isNetworkConnected() -> getWeatherFromServer(city)
         }
         weaterView?.swipeAnimFinish()
     }
 
-    fun loadWeather(city: String) {
+    private fun getWeatherFromServer(city: String) {
+        try {
+            if (!requestDisp.isDisposed) {
+                requestDisp.dispose()
+            }
+        } catch (ex: Exception) {
+            weaterView?.setLog(ERROR)
+        }
         requestDisp = restIteractor.getCityWeather(city)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

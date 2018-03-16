@@ -1,8 +1,8 @@
 package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
-interface IPresenter<IWeatherView> {
+interface IPresenter<in T> {
 
-    fun attachView(view: IWeatherView)
+    fun attachView(view: T)
     fun detachView()
 
 }

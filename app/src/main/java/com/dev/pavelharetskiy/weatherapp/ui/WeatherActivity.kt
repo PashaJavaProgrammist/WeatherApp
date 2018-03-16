@@ -77,7 +77,7 @@ class WeatherActivity : AppCompatActivity(), IWeatherView {
 
     private fun onSwipe() {
         if (weatherPresenter.cityName.isNotEmpty()) {
-            weatherPresenter.onClickLoadForecast(weatherPresenter.cityName)
+            weatherPresenter.loadWeather(weatherPresenter.cityName)
         } else {
             swipeAnimFinish()
         }
