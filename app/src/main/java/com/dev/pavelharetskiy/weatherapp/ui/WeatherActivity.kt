@@ -13,6 +13,9 @@ import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
 //import com.jakewharton.rxbinding2.widget.RxTextView
 import kotlinx.android.synthetic.main.activity_weather.*
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 
 class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
@@ -32,12 +35,20 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     }
 
     override fun showForecast(data: WeatherResponseModel) {
-        weatherPresenter.cityName = data.name
-        tvCityName.text = data.name
-        tvAvTemp.text = getString(R.string.temp).plus(getString(R.string.format_two_num).format(data.main.temp))
-        tvDate.text = weatherPresenter.dateFormat.format(Date(data.dt * 1000)).plus(getString(R.string.space)).plus(weatherPresenter.timeFormat.format(Date(data.dt * 1000)))
-        tvHum.text = getString(R.string.humidity).plus(getString(R.string.two_dotes)).plus(data.main.humidity).plus(getString(R.string.procents))
-        tvPresh.text = getString(R.string.pres).plus(data.main.pressure.toString()).plus(getString(R.string.hPA))
+        launch(CommonPool) {
+            weatherPresenter.cityName = data.name
+            val date = weatherPresenter.dateFormat.format(Date(data.dt * 1000)).plus(getString(R.string.space)).plus(weatherPresenter.timeFormat.format(Date(data.dt * 1000)))
+            val hum = getString(R.string.humidity).plus(getString(R.string.two_dotes)).plus(data.main.humidity).plus(getString(R.string.procents))
+            val pressure = getString(R.string.pres).plus(data.main.pressure.toString()).plus(getString(R.string.hPA))
+            val temp = getString(R.string.temp).plus(getString(R.string.format_two_num).format(data.main.temp))
+            launch(UI) {
+                tvCityName.text = data.name
+                tvAvTemp.text = temp
+                tvDate.text = date
+                tvHum.text = hum
+                tvPresh.text = pressure
+            }
+        }
     }
 
     override fun swipeAnimFinish() {
@@ -45,8 +56,8 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     }
 
     override fun showToast(text: String, longToast: Boolean) {
-        val lengts: Int = if (longToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-        Toast.makeText(this, text, lengts).show()
+        val length: Int = if (longToast) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
+        Toast.makeText(this, text, length).show()
     }
 
     override fun setLog(logInfo: String) {

@@ -4,7 +4,7 @@
     <string name="city">City</string>
     <string name="date">Date</string>
     <string name="min_max_temp">Min-max Temp</string>
-    <string name="presure">Presure</string>
+    <string name="pressure">Presure</string>
     <string name="humidity">Humidity</string>
     <string name="temperature">Temperature</string>
     <string name="log">Log</string>
