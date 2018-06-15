@@ -56,9 +56,6 @@ class WeatherActivity : MvpAppCompatActivity(), IWeatherView {
     override fun onResume() {
         super.onResume()
 
-//        Not mvp
-//        weatherPresenter.textObserve(RxTextView.textChanges(edCity))
-
         edCity.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(city: Editable) {
                 weatherPresenter.loadWeather(city.toString())

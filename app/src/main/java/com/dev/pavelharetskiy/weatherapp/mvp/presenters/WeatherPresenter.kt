@@ -51,24 +51,23 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     }
 
     fun loadWeather(city: String) {
+        //Coroutine
         launch(CommonPool) {
             val response = async {
                 restIteractor.getCityWeather(city).execute()
             }
             val weatherResponseModel = response.await()
             launch(UI) {
-                if (weatherResponseModel.code() != 200) {
-                    if (isViewAttached) {
-                        viewState.setLog(ERROR)
+                if (isViewAttached) {
+                    when (weatherResponseModel.code()) {
+                        200 -> weatherResponseModel.body()?.also {
+                            viewState.showToast(it.name, true)
+                            viewState.setLog(FOUND)
+                            viewState.showForecast(it)
+                            weather = it
+                        }
+                        else -> viewState.setLog(ERROR)
                     }
-                }
-                weatherResponseModel.body()?.also {
-                    if (isViewAttached) {
-                        viewState.showToast(it.name, true)
-                        viewState.setLog(FOUND)
-                        viewState.showForecast(it)
-                    }
-                    weather = it
                 }
             }
         }
