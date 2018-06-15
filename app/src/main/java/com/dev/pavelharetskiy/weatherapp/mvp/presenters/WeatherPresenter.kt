@@ -2,18 +2,24 @@ package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
 //import com.jakewharton.rxbinding2.InitialValueObservable
 //import java.util.concurrent.TimeUnit
+//import io.reactivex.android.schedulers.AndroidSchedulers
+//import io.reactivex.disposables.Disposable
+//import io.reactivex.schedulers.Schedulers
 import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
-import com.dev.pavelharetskiy.weatherapp.*
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
+import com.dev.pavelharetskiy.weatherapp.DISCONNECT
+import com.dev.pavelharetskiy.weatherapp.ENTER_CITY
+import com.dev.pavelharetskiy.weatherapp.FOUND
 import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
 import com.dev.pavelharetskiy.weatherapp.mvp.models.DateFormatsList
 import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
 import com.dev.pavelharetskiy.weatherapp.mvp.views.IWeatherView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 import javax.inject.Inject
 
 @InjectViewState
@@ -37,7 +43,7 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     var dateFormat = dateFormatsList.listFormats[1]
     var timeFormat = dateFormatsList.listFormats[0]
 
-    private lateinit var requestDisp: Disposable
+    //    private lateinit var requestDisp: Disposable
     var cityName = ""
     private var isViewAttached = false
 
@@ -54,25 +60,41 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     }
 
     fun loadWeather(city: String) {
-        requestDisp = restIteractor.getCityWeather(city)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-                            if (isViewAttached) {
-                                viewState.showToast(it.name, true)
-                                viewState.setLog(FOUND)
-                                viewState.showForecast(it)
-                            }
-                            weather = it
-                            requestDisp.dispose()
-                        },
-                        {
-                            if (isViewAttached) {
-                                viewState.setLog(ERROR)
-                            }
-                            requestDisp.dispose()
-                        })
+//        requestDisp = restIteractor.getCityWeather(city)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(
+//                        {
+//                            if (isViewAttached) {
+//                                viewState.showToast(it.name, true)
+//                                viewState.setLog(FOUND)
+//                                viewState.showForecast(it)
+//                            }
+//                            weather = it
+//                            requestDisp.dispose()
+//                        },
+//                        {
+//                            if (isViewAttached) {
+//                                viewState.setLog(ERROR)
+//                            }
+//                            requestDisp.dispose()
+//                        })
+        launch(CommonPool) {
+            val response = async {
+                restIteractor.getCityWeather(city).execute()
+            }
+            val weatherResponseModel = response.await()
+            launch(UI) {
+                weatherResponseModel.body()?.also {
+                    if (isViewAttached) {
+                        viewState.showToast(it.name, true)
+                        viewState.setLog(FOUND)
+                        viewState.showForecast(it)
+                    }
+                    weather = it
+                }
+            }
+        }
     }
 
     private fun isNetworkConnected() = connectivityManager.activeNetworkInfo?.isConnectedOrConnecting == true
