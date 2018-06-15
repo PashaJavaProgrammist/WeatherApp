@@ -18,7 +18,6 @@ class RestService {
         val gson = GsonBuilder().setLenient().create()
         val retrofit = Retrofit.Builder()
                 .baseUrl(BASE_URL)
-//                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(httpClient.build())
                 .build()

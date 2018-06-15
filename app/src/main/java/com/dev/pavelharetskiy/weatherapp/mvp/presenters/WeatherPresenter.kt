@@ -1,16 +1,12 @@
 package com.dev.pavelharetskiy.weatherapp.mvp.presenters
 
-//import com.jakewharton.rxbinding2.InitialValueObservable
-//import java.util.concurrent.TimeUnit
-//import io.reactivex.android.schedulers.AndroidSchedulers
-//import io.reactivex.disposables.Disposable
-//import io.reactivex.schedulers.Schedulers
 import android.net.ConnectivityManager
 import com.arellomobile.mvp.InjectViewState
 import com.arellomobile.mvp.MvpPresenter
 import com.dev.pavelharetskiy.weatherapp.App.Companion.daggerComponent
 import com.dev.pavelharetskiy.weatherapp.DISCONNECT
 import com.dev.pavelharetskiy.weatherapp.ENTER_CITY
+import com.dev.pavelharetskiy.weatherapp.ERROR
 import com.dev.pavelharetskiy.weatherapp.FOUND
 import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
 import com.dev.pavelharetskiy.weatherapp.mvp.models.DateFormatsList
@@ -43,13 +39,8 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     var dateFormat = dateFormatsList.listFormats[1]
     var timeFormat = dateFormatsList.listFormats[0]
 
-    //    private lateinit var requestDisp: Disposable
     var cityName = ""
     private var isViewAttached = false
-
-    //    private lateinit var textChanges: InitialValueObservable<CharSequence>
-    //var isAfterConfChanged: Boolean = false
-    //    private lateinit var textWatchDisposable: Disposable
 
     fun onClickLoadForecast(city: String) {
         when {
@@ -60,31 +51,17 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     }
 
     fun loadWeather(city: String) {
-//        requestDisp = restIteractor.getCityWeather(city)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(
-//                        {
-//                            if (isViewAttached) {
-//                                viewState.showToast(it.name, true)
-//                                viewState.setLog(FOUND)
-//                                viewState.showForecast(it)
-//                            }
-//                            weather = it
-//                            requestDisp.dispose()
-//                        },
-//                        {
-//                            if (isViewAttached) {
-//                                viewState.setLog(ERROR)
-//                            }
-//                            requestDisp.dispose()
-//                        })
         launch(CommonPool) {
             val response = async {
                 restIteractor.getCityWeather(city).execute()
             }
             val weatherResponseModel = response.await()
             launch(UI) {
+                if (weatherResponseModel.code() != 200) {
+                    if (isViewAttached) {
+                        viewState.setLog(ERROR)
+                    }
+                }
                 weatherResponseModel.body()?.also {
                     if (isViewAttached) {
                         viewState.showToast(it.name, true)
@@ -112,26 +89,6 @@ class WeatherPresenter : MvpPresenter<IWeatherView>() {
     override fun detachView(view: IWeatherView?) {
         super.detachView(view)
         isViewAttached = false
-//        textWatchDisposable.dispose()
     }
 
-    //        Not mvp
-    /*fun textObserve(textChanges: InitialValueObservable<CharSequence>) {
-        this.textChanges = textChanges
-        textWatchDisposable = textChanges
-                .subscribeOn(Schedulers.io())
-                .debounce(300, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        {
-                            when {
-                                isAfterConfChanged -> isAfterConfChanged = false
-                                !isNetworkConnected() -> viewState.showToast(DISCONNECT, false)
-                                it.isNotEmpty() -> loadWeather(it.toString())
-                            }
-                        },
-                        {
-                            viewState.showToast("$TEXT_WATCH_ERROR: $it", true)
-                        })
-    }*/
 }
