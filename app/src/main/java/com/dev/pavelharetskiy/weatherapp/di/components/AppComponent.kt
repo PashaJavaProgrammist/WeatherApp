@@ -6,6 +6,7 @@ import com.dev.pavelharetskiy.weatherapp.di.modules.ConnectManagerModule
 import com.dev.pavelharetskiy.weatherapp.di.modules.DateFormatModule
 import com.dev.pavelharetskiy.weatherapp.di.modules.RestModule
 import com.dev.pavelharetskiy.weatherapp.mvp.presenters.WeatherPresenter
+import com.dev.pavelharetskiy.weatherapp.providers.WeatherWidget
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -25,4 +26,5 @@ interface AppComponent {
     fun inject(wp: WeatherPresenter)
 
     fun inject(app: App)
+    fun inject(weatherWidget: WeatherWidget)
 }

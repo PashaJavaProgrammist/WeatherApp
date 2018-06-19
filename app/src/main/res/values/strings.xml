@@ -15,4 +15,8 @@
     <string name="pres">Presure:\u0020</string>
     <string name="hPA">\u0020hPa</string>
     <string name="space">\u0020</string>
+    <string name="widget_name">weather</string>
+    <string name="please">Please,</string>
+    <string name="refresh">refresh</string>
+    <string name="minsk">Minsk</string>
 </resources>
