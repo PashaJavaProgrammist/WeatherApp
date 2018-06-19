@@ -10,10 +10,10 @@ import android.widget.RemoteViews
 import com.dev.pavelharetskiy.weatherapp.App
 import com.dev.pavelharetskiy.weatherapp.R
 import com.dev.pavelharetskiy.weatherapp.iteractors.RestIteractor
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
+import com.dev.pavelharetskiy.weatherapp.mvp.models.WeatherResponseModel
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 
@@ -26,6 +26,8 @@ class WeatherWidget : AppWidgetProvider() {
     @Inject
     lateinit var restIteractor: RestIteractor
 
+    var updateInProgress = false
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
@@ -33,9 +35,6 @@ class WeatherWidget : AppWidgetProvider() {
             val appWidgetId = appWidgetIds[i]
 
             val widgetView = RemoteViews(context.packageName, R.layout.widget)
-
-            //ProgressBar Visibility
-            widgetView.setViewVisibility(R.id.progress, View.VISIBLE)
 
             //Widget update
             val updateIntent = Intent(context, WeatherWidget::class.java)
@@ -45,27 +44,39 @@ class WeatherWidget : AppWidgetProvider() {
             val pIntent = PendingIntent.getBroadcast(context, appWidgetId, updateIntent, 0)
             widgetView.setOnClickPendingIntent(R.id.wd_add, pIntent)
 
-            //Coroutine
-            launch(CommonPool) {
-                val response = async {
-                    restIteractor.getCityWeather(context.getString(R.string.minsk)).execute()
-                }
-                val weatherResponseModel = response.await()
-                launch(UI) {
-                    when (weatherResponseModel.code()) {
-                        200 -> {
-                            widgetView.setTextViewText(R.id.city, weatherResponseModel.body()?.name)
-                            widgetView.setTextViewText(R.id.degrees, "${weatherResponseModel.body()?.main?.temp} °C")
-                        }
-                        else -> {
-                            widgetView.setTextViewText(R.id.city, context.getString(R.string.please))
-                            widgetView.setTextViewText(R.id.degrees, context.getString(R.string.refresh))
-                        }
+            //ProgressBar visibility
+            widgetView.setViewVisibility(R.id.progress, View.VISIBLE)
+
+            if (!updateInProgress) {
+                updateInProgress = true
+                restIteractor.getCityWeather(context.getString(R.string.minsk)).enqueue(object : Callback<WeatherResponseModel> {
+
+                    override fun onFailure(call: Call<WeatherResponseModel>?, t: Throwable?) {
+                        widgetView.setTextViewText(R.id.city, context.getString(R.string.please))
+                        widgetView.setTextViewText(R.id.degrees, context.getString(R.string.refresh))
+                        widgetView.setViewVisibility(R.id.progress, View.GONE)
+                        appWidgetManager.updateAppWidget(appWidgetId, widgetView)
+                        updateInProgress = false
                     }
-                    widgetView.setViewVisibility(R.id.progress, View.GONE)
-                    appWidgetManager.updateAppWidget(appWidgetId, widgetView)
-                }
+
+                    override fun onResponse(call: Call<WeatherResponseModel>?, response: Response<WeatherResponseModel>?) {
+                        when (response?.code()) {
+                            200 -> {
+                                widgetView.setTextViewText(R.id.city, response.body()?.name)
+                                widgetView.setTextViewText(R.id.degrees, "${response.body()?.main?.temp} °C")
+                            }
+                            else -> {
+                                widgetView.setTextViewText(R.id.city, context.getString(R.string.please))
+                                widgetView.setTextViewText(R.id.degrees, context.getString(R.string.refresh))
+                            }
+                        }
+                        widgetView.setViewVisibility(R.id.progress, View.GONE)
+                        appWidgetManager.updateAppWidget(appWidgetId, widgetView)
+                        updateInProgress = false
+                    }
+                })
             }
+            appWidgetManager.updateAppWidget(appWidgetId, widgetView)
         }
     }
 }
