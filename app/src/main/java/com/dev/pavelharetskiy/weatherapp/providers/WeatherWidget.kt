@@ -52,8 +52,8 @@ class WeatherWidget : AppWidgetProvider() {
                 restIteractor.getCityWeather(context.getString(R.string.minsk)).enqueue(object : Callback<WeatherResponseModel> {
 
                     override fun onFailure(call: Call<WeatherResponseModel>?, t: Throwable?) {
-                        widgetView.setTextViewText(R.id.city, context.getString(R.string.please))
-                        widgetView.setTextViewText(R.id.degrees, context.getString(R.string.refresh))
+                        widgetView.setTextViewText(R.id.city, context.getString(R.string.some))
+                        widgetView.setTextViewText(R.id.degrees, context.getString(R.string.error))
                         widgetView.setViewVisibility(R.id.progress, View.GONE)
                         appWidgetManager.updateAppWidget(appWidgetId, widgetView)
                         updateInProgress = false
